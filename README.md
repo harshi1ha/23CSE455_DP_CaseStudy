@@ -8,8 +8,7 @@ Design Pattern Analysis in a Flask-Based Event Management Application.
 |---|---|---|
 | AM.SC.U4CSE23222 | Harshitha D | CSE |
 | AM.SC.U4CSE23265 | T Heshaja | CSE |
-| AM.SC.U4CSE23222 | Harshitha D | CSE |
-| AM.SC.U4CSE23265 | T Heshaja | CSE |
+
 
 Individual task allocation was not preserved in the supplied case-study materials, so no individual contribution claims are invented here.
 
