@@ -1,0 +1,5 @@
+Before/after LOC rule: count nonblank, non-comment source lines.
+routes.py baseline: 340
+routes.py evolved: 336
+New repository/strategy/observer/service modules: 193 nonblank, non-comment lines combined.
+Interpretation: route LOC decreased by 4, while responsibilities moved into explicit collaborators; LOC alone is not treated as proof of design quality.

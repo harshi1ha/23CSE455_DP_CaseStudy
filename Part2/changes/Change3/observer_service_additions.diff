@@ -1,0 +1,84 @@
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/observers/registration_observer.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,9 @@
++from abc import ABC, abstractmethod
++
++
++class RegistrationObserver(ABC):
++    """Observer interface for side effects after event registration."""
++
++    @abstractmethod
++    def update(self, event, user, tickets):
++        raise NotImplementedError
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/observers/notification_observer.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,16 @@
++import logging
++
++from .registration_observer import RegistrationObserver
++
++
++class RegistrationNotificationObserver(RegistrationObserver):
++    """Logs a notification when a registration completes."""
++
++    def __init__(self, logger=None):
++        self.logger = logger or logging.getLogger(__name__)
++        self.notifications = []
++
++    def update(self, event, user, tickets):
++        message = f"Registration confirmed: user={user.id}, event={event.id}, tickets={len(tickets)}"
++        self.notifications.append(message)
++        self.logger.info(message)
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/observers/statistics_observer.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,13 @@
++from collections import Counter
++
++from .registration_observer import RegistrationObserver
++
++
++class RegistrationStatisticsObserver(RegistrationObserver):
++    """Maintains registration counts independently of the registration workflow."""
++
++    def __init__(self):
++        self.registrations_by_event = Counter()
++
++    def update(self, event, user, tickets):
++        self.registrations_by_event[event.id] += len(tickets)
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/services/registration_service.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,34 @@
++from datetime import datetime
++
++from models import Ticket, TicketStatus
++from utils import generate_ticket_number
++
++
++class EventRegistrationService:
++    """Subject that coordinates ticket creation and notifies registered observers."""
++
++    def __init__(self, ticket_repository):
++        self.ticket_repository = ticket_repository
++        self._observers = []
++
++    def attach(self, observer):
++        self._observers.append(observer)
++
++    def register(self, event, attendee, quantity):
++        tickets = [
++            Ticket(
++                event_id=event.id,
++                attendee_id=attendee.id,
++                status=TicketStatus.PAID,
++                ticket_number=generate_ticket_number(),
++                paid_at=datetime.utcnow(),
++            )
++            for _ in range(quantity)
++        ]
++        self.ticket_repository.create_many(tickets)
++        self.notify(event, attendee, tickets)
++        return tickets
++
++    def notify(self, event, attendee, tickets):
++        for observer in self._observers:
++            observer.update(event, attendee, tickets)

@@ -1,0 +1,4 @@
+part,model_and_date,prompt_file,input_file,output_file,evaluation,verification_file
+Part1,ChatGPT GPT-5.6 Luna; 2026-10-06,Part1/prompt.txt,Event-Management-system Flask source + assignment instructions,Part1/output.txt,Baseline pattern inventory checked against source; unsupported candidates rejected,Part1/verification.txt
+Part2,ChatGPT GPT-5.6 Luna; 2026-10-06,Part2/prompt.txt,Modified Flask project + assignment requirements,Part2/output.txt,Structural tests 4/4 and Python compilation passed; runtime limitation explicitly recorded,Part2/verification.txt
+Part3,ChatGPT GPT-5.6 Luna; 2026-10-06,Part3/prompt.txt,Part 3 cross-language task specification,Part3/output.txt,12/12 implementations passed; five-run medians measured,Part3/verification.txt

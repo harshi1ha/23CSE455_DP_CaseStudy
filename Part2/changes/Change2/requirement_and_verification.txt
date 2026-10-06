@@ -1,0 +1,4 @@
+CH02 — Strategy Pattern
+Requirement: make event filtering criteria interchangeable instead of hard-coded route conditionals.
+Implementation: added EventFilterStrategy plus text, category and date-range strategies; attendee_events assembles active strategies and EventRepository applies them.
+Verification: structural pattern tests passed; Python compilation passed.

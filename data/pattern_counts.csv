@@ -1,0 +1,31 @@
+source_version,summary,pattern_name,count
+original,per_pattern,MVC,1
+original,per_pattern,Decorator,1
+original,per_pattern,Active Record-like ORM,1
+original,per_pattern,Form Object,1
+original,total_pattern_types,,4
+original,total_pattern_instances,,4
+after_CH01_repository,per_pattern,MVC,1
+after_CH01_repository,per_pattern,Decorator,1
+after_CH01_repository,per_pattern,Active Record-like ORM,1
+after_CH01_repository,per_pattern,Form Object,1
+after_CH01_repository,per_pattern,Repository,1
+after_CH01_repository,total_pattern_types,,5
+after_CH01_repository,total_pattern_instances,,5
+after_CH02_strategy,per_pattern,MVC,1
+after_CH02_strategy,per_pattern,Decorator,1
+after_CH02_strategy,per_pattern,Active Record-like ORM,1
+after_CH02_strategy,per_pattern,Form Object,1
+after_CH02_strategy,per_pattern,Repository,1
+after_CH02_strategy,per_pattern,Strategy,1
+after_CH02_strategy,total_pattern_types,,6
+after_CH02_strategy,total_pattern_instances,,6
+after_CH03_observer,per_pattern,MVC,1
+after_CH03_observer,per_pattern,Decorator,1
+after_CH03_observer,per_pattern,Active Record-like ORM,1
+after_CH03_observer,per_pattern,Form Object,1
+after_CH03_observer,per_pattern,Repository,1
+after_CH03_observer,per_pattern,Strategy,1
+after_CH03_observer,per_pattern,Observer,1
+after_CH03_observer,total_pattern_types,,7
+after_CH03_observer,total_pattern_instances,,7

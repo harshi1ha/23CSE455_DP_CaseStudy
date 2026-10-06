@@ -1,0 +1,4 @@
+CH03 — Observer Pattern
+Requirement: decouple registration side effects from the route.
+Implementation: EventRegistrationService is the subject; RegistrationNotificationObserver and RegistrationStatisticsObserver receive registration updates.
+Verification: structural pattern tests passed; Python compilation passed.

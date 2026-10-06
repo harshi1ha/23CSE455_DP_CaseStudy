@@ -1,0 +1,2 @@
+Conversation-derived prompt record (reconstructed):
+Refactor the Flask event-management application for three controlled design-pattern changes: CH01 Repository, CH02 Strategy, and CH03 Observer. Keep the changes testable and evidence-based. Do not claim runtime success unless tests actually pass.

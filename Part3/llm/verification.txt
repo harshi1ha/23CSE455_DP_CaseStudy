@@ -1,0 +1,1 @@
+Verification result: 12/12 Part 3 implementations passed their tests. Five-run medians were measured for every implementation. Timings are process-level measurements including startup overhead and are not presented as algorithm-only benchmarks.

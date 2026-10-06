@@ -1,0 +1,5 @@
+All 12 implementations use deterministic small problems with the same conceptual inputs and expected outputs.
+Repository: create/store events and retrieve by id.
+Strategy: filter the same event set by name/category criteria.
+Observer: register an attendee and produce both notification and statistics reactions.
+Timing protocol: compile first; one warmup; five measured process runs; median reported.

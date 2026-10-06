@@ -1,0 +1,5 @@
+LLM output used during this work:
+CH01 introduced repositories for user/event/ticket persistence and removed direct persistence responsibilities from routes.
+CH02 introduced interchangeable event-filtering strategies for text, category, and date criteria.
+CH03 introduced an EventRegistrationService subject with notification and statistics observers.
+Structural pattern tests were added.

@@ -1,0 +1,2 @@
+LLM output used during this work:
+A Part3 package was created containing 3 patterns x 4 languages = 12 implementations, plus test outputs and cross_language.csv. The same deterministic problems were used across languages.

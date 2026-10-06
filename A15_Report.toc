@@ -1,0 +1,32 @@
+\contentsline {section}{\numberline {1}Application and Architecture}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Application}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Original Source and Environment}{2}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Scope and Architecture}{2}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Run and Verification}{3}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Part 1 Pattern Discovery}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Method}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Baseline Totals}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Pattern Inventory}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Confirmed Pattern Records}{4}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Event Creation MVC Flow}{4}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}Authenticated Event Route Registration}{4}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Event and Ticket Persistence Model}{4}{subsubsection.2.4.3}%
+\contentsline {subsubsection}{\numberline {2.4.4}Event Creation Validation}{4}{subsubsection.2.4.4}%
+\contentsline {subsection}{\numberline {2.5}Rejected Candidates}{4}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Part 2 Evolution and Refactoring}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}CH01 --- Repository Pattern}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}CH02 --- Strategy Pattern}{5}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}CH03 --- Observer Pattern}{5}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Updated Pattern Counts}{5}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Before/After Metrics}{6}{subsection.3.5}%
+\contentsline {section}{\numberline {4}Part 3 Cross-Language Comparison}{6}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Selected Instances and Common Specification}{6}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Measured Results}{6}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Static and Dynamic Comparison}{7}{subsection.4.3}%
+\contentsline {section}{\numberline {5}LLM Records and Human Verification}{7}{section.5}%
+\contentsline {section}{\numberline {6}Findings, Contributions and References}{7}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Findings}{7}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Limitations}{7}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Team Contributions}{8}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}References}{8}{subsection.6.4}%
+\contentsline {section}{\numberline {7}Team Folder and Dataset Map}{8}{section.7}%

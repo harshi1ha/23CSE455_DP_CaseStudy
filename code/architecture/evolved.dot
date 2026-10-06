@@ -1,0 +1,1 @@
+digraph G { rankdir=LR; node [shape=box]; Browser -> Routes; Routes -> EventForm; Routes -> Repositories; Routes -> Strategies; Routes -> RegistrationService; Repositories -> Models; Repositories -> SQLAlchemy; RegistrationService -> Observers; Routes -> Templates; }

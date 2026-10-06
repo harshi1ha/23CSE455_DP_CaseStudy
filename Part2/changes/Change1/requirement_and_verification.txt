@@ -1,0 +1,4 @@
+CH01 — Repository Pattern
+Requirement: remove direct persistence/query responsibilities from Flask route handlers.
+Implementation: added repositories/event_repository.py, ticket_repository.py and user_repository.py; routes use repository methods.
+Verification: tests/test_design_patterns.py -> 4/4 structural tests passed; all modified Python files compile.

@@ -1,0 +1,4 @@
+part,model_and_date,prompt_file,input_file,output_file,evaluation,verification_file
+Part1,ChatGPT GPT-5.6 Luna; 2026-10-06,Part1/llm/prompt.txt,code/original/ + assignment instructions,Part1/llm/output.txt,Baseline pattern inventory checked against source; unsupported candidates rejected,Part1/llm/verification.txt
+Part2,ChatGPT GPT-5.6 Luna; 2026-10-06,Part2/llm/prompt.txt,Part2/code/evolved/ + assignment requirements,Part2/llm/output.txt,Structural tests 4/4 and Python compilation passed; runtime limitation explicitly recorded,Part2/llm/verification.txt
+Part3,ChatGPT GPT-5.6 Luna; 2026-10-06,Part3/llm/prompt.txt,Part3/ + Part 3 task specification,Part3/llm/output.txt,12/12 implementations passed; five-run medians measured,Part3/llm/verification.txt

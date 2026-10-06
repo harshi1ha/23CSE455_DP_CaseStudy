@@ -1,0 +1,1 @@
+Human/source verification: inspected the supplied Flask source. Representative locations included routes.py, forms.py, models.py, app.py, and templates/organizer/create_event.html. Baseline Python source compilation passed. Unsupported pattern candidates were not added to the baseline CSV.

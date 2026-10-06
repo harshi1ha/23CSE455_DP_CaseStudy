@@ -1,0 +1,2 @@
+Conversation-derived prompt record (reconstructed from the user's assignment request and subsequent project-analysis discussion):
+Analyze the supplied Flask Event Management application for defensible design-pattern instances. Use source evidence, participant roles, locations, behavior/collaboration, and reject unsupported candidates. Produce records suitable for patterns.csv and pattern_counts.csv. Do not invent classes, roles, or patterns.

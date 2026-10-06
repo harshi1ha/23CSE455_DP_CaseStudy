@@ -1,0 +1,327 @@
+--- code/original/routes.py	2025-10-14 13:40:57.000000000 +0000
++++ Part2/code/evolved/routes.py	2026-10-06 06:53:31.000000000 +0000
+@@ -1,8 +1,14 @@
+ from flask import render_template, redirect, url_for, flash, request, jsonify, abort
+ from flask_login import login_user, logout_user, login_required, current_user
+ from werkzeug.security import generate_password_hash, check_password_hash
+-from app import db
+ from models import User, Event, Ticket, UserType, TicketStatus, EventCategory
++from repositories import EventRepository, TicketRepository, UserRepository
++from strategies import (
++    TextSearchStrategy, CategoryFilterStrategy,
++    DateFromFilterStrategy, DateToFilterStrategy,
++)
++from observers import RegistrationNotificationObserver, RegistrationStatisticsObserver
++from services import EventRegistrationService
+ from forms import LoginForm, RegistrationForm, ProfileForm, EventForm, SearchForm, TicketForm
+ from utils import (
+     generate_ticket_number, format_date, format_date_short,
+@@ -13,6 +19,16 @@
+ import logging
+ 
+ def register_routes(app):
++    # Routes depend on repository interfaces rather than managing SQLAlchemy sessions directly.
++    user_repo = UserRepository()
++    event_repo = EventRepository()
++    ticket_repo = TicketRepository()
++    registration_service = EventRegistrationService(ticket_repo)
++    notification_observer = RegistrationNotificationObserver()
++    statistics_observer = RegistrationStatisticsObserver()
++    registration_service.attach(notification_observer)
++    registration_service.attach(statistics_observer)
++
+     
+     @app.template_filter('format_date')
+     def _format_date(date):
+@@ -48,7 +64,7 @@
+                 
+         form = LoginForm()
+         if form.validate_on_submit():
+-            user = User.query.filter_by(email=form.email.data).first()
++            user = user_repo.get_by_email(form.email.data)
+             
+             if user is None or not user.check_password(form.password.data):
+                 flash('Invalid email or password', 'danger')
+@@ -84,8 +100,7 @@
+             )
+             user.set_password(form.password.data)
+             
+-            db.session.add(user)
+-            db.session.commit()
++            user_repo.save(user)
+             
+             flash('Registration successful! You can now log in.', 'success')
+             return redirect(url_for('login'))
+@@ -111,7 +126,7 @@
+         stats = get_organizer_stats(current_user)
+         
+         # Get recent events
+-        events = current_user.organized_events.order_by(Event.created_at.desc()).limit(5).all()
++        events = event_repo.list_by_organizer(current_user.id, order_by="created_at", limit=5)
+         
+         return render_template('organizer/dashboard.html', stats=stats, events=events)
+ 
+@@ -140,8 +155,7 @@
+                 organizer_id=current_user.id
+             )
+             
+-            db.session.add(event)
+-            db.session.commit()
++            event_repo.create(event)
+             
+             flash('Event created successfully!', 'success')
+             return redirect(url_for('event_details', event_id=event.id))
+@@ -155,13 +169,15 @@
+             flash('You need to be an organizer to manage events.', 'danger')
+             return redirect(url_for('index'))
+             
+-        events = current_user.organized_events.order_by(Event.start_date.desc()).all()
++        events = event_repo.list_by_organizer(current_user.id, order_by="start_date_desc")
+         return render_template('organizer/manage_events.html', events=events)
+ 
+     @app.route('/organizer/events/<int:event_id>')
+     @login_required
+     def event_details(event_id):
+-        event = Event.query.get_or_404(event_id)
++        event = event_repo.get_by_id(event_id)
++        if event is None:
++            abort(404)
+         
+         # Check if current user is the organizer of this event
+         if event.organizer_id != current_user.id and not current_user.is_attendee():
+@@ -169,14 +185,16 @@
+             return redirect(url_for('index'))
+             
+         stats = get_event_stats(event)
+-        tickets = event.tickets.all()
++        tickets = event_repo.list_tickets(event)
+         
+         return render_template('organizer/event_details.html', event=event, stats=stats, tickets=tickets)
+ 
+     @app.route('/organizer/events/<int:event_id>/edit', methods=['GET', 'POST'])
+     @login_required
+     def edit_event(event_id):
+-        event = Event.query.get_or_404(event_id)
++        event = event_repo.get_by_id(event_id)
++        if event is None:
++            abort(404)
+         
+         # Check if current user is the organizer of this event
+         if event.organizer_id != current_user.id:
+@@ -197,7 +215,7 @@
+             event.max_attendees = form.max_attendees.data
+             event.price = form.price.data
+             
+-            db.session.commit()
++            event_repo.update(event)
+             
+             flash('Event updated successfully!', 'success')
+             return redirect(url_for('event_details', event_id=event.id))
+@@ -210,15 +228,16 @@
+     @app.route('/organizer/events/<int:event_id>/delete', methods=['POST'])
+     @login_required
+     def delete_event(event_id):
+-        event = Event.query.get_or_404(event_id)
++        event = event_repo.get_by_id(event_id)
++        if event is None:
++            abort(404)
+         
+         # Check if current user is the organizer of this event
+         if event.organizer_id != current_user.id:
+             flash('You are not authorized to delete this event.', 'danger')
+             return redirect(url_for('index'))
+             
+-        db.session.delete(event)
+-        db.session.commit()
++        event_repo.delete(event)
+         
+         flash('Event deleted successfully!', 'success')
+         return redirect(url_for('manage_events'))
+@@ -239,12 +258,12 @@
+                 return redirect(url_for('organizer_profile'))
+                 
+             # Check if username is already taken by another user
+-            if form.username.data != current_user.username and User.query.filter_by(username=form.username.data).first():
++            if form.username.data != current_user.username and user_repo.get_by_username(form.username.data):
+                 flash('Username is already taken.', 'danger')
+                 return redirect(url_for('organizer_profile'))
+                 
+             # Check if email is already taken by another user
+-            if form.email.data != current_user.email and User.query.filter_by(email=form.email.data).first():
++            if form.email.data != current_user.email and user_repo.get_by_email(form.email.data):
+                 flash('Email is already registered.', 'danger')
+                 return redirect(url_for('organizer_profile'))
+                 
+@@ -258,7 +277,7 @@
+             if form.new_password.data:
+                 current_user.set_password(form.new_password.data)
+                 
+-            db.session.commit()
++            user_repo.save(current_user)
+             flash('Profile updated successfully!', 'success')
+             return redirect(url_for('organizer_profile'))
+             
+@@ -269,32 +288,25 @@
+     def attendee_events():
+         search_form = SearchForm(request.args, meta={'csrf': False})
+         
+-        # Query events
+-        query = Event.query.filter(Event.start_date > datetime.utcnow())
+-        
+-        # Apply search filters
++        strategies = []
+         if search_form.query.data:
+-            search_query = f"%{search_form.query.data}%"
+-            query = query.filter(Event.title.like(search_query) | Event.description.like(search_query))
+-            
++            strategies.append(TextSearchStrategy(search_form.query.data))
+         if search_form.category.data:
+-            category = EventCategory[search_form.category.data]
+-            query = query.filter(Event.category == category)
+-            
++            strategies.append(CategoryFilterStrategy(EventCategory[search_form.category.data]))
+         if search_form.date_from.data:
+-            query = query.filter(Event.start_date >= search_form.date_from.data)
+-            
++            strategies.append(DateFromFilterStrategy(search_form.date_from.data))
+         if search_form.date_to.data:
+-            query = query.filter(Event.start_date <= search_form.date_to.data)
+-            
+-        # Order by start date
+-        events = query.order_by(Event.start_date).all()
++            strategies.append(DateToFilterStrategy(search_form.date_to.data))
++
++        events = event_repo.search_upcoming(strategies)
+         
+         return render_template('attendee/events.html', events=events, form=search_form)
+ 
+     @app.route('/events/<int:event_id>')
+     def view_event(event_id):
+-        event = Event.query.get_or_404(event_id)
++        event = event_repo.get_by_id(event_id)
++        if event is None:
++            abort(404)
+         
+         # Check if the event is upcoming
+         is_upcoming = event.is_upcoming()
+@@ -302,11 +314,7 @@
+         # Check if the current user has already registered for this event
+         has_ticket = False
+         if current_user.is_authenticated and current_user.is_attendee():
+-            ticket = Ticket.query.filter_by(
+-                event_id=event.id, 
+-                attendee_id=current_user.id,
+-                status=TicketStatus.PAID
+-            ).first()
++            ticket = ticket_repo.find_paid_for_event_and_user(event.id, current_user.id)
+             has_ticket = ticket is not None
+             
+         # Create ticket form if the user can register
+@@ -325,7 +333,9 @@
+             flash('You need to be an attendee to register for events.', 'danger')
+             return redirect(url_for('index'))
+             
+-        event = Event.query.get_or_404(event_id)
++        event = event_repo.get_by_id(event_id)
++        if event is None:
++            abort(404)
+         
+         # Check if the event is upcoming
+         if not event.is_upcoming():
+@@ -338,11 +348,7 @@
+             return redirect(url_for('view_event', event_id=event.id))
+             
+         # Check if the user has already registered for this event
+-        existing_ticket = Ticket.query.filter_by(
+-            event_id=event.id, 
+-            attendee_id=current_user.id,
+-            status=TicketStatus.PAID
+-        ).first()
++        existing_ticket = ticket_repo.find_paid_for_event_and_user(event.id, current_user.id)
+         
+         if existing_ticket:
+             flash('You are already registered for this event.', 'info')
+@@ -357,18 +363,7 @@
+                 flash(f'Only {event.max_attendees - event.attendees_count()} tickets left for this event.', 'danger')
+                 return redirect(url_for('view_event', event_id=event.id))
+                 
+-            for _ in range(quantity):
+-                ticket = Ticket(
+-                    event_id=event.id,
+-                    attendee_id=current_user.id,
+-                    status=TicketStatus.PAID,  # For simplicity, we're making tickets paid immediately
+-                    ticket_number=generate_ticket_number(),
+-                    paid_at=datetime.utcnow()
+-                )
+-                
+-                db.session.add(ticket)
+-                
+-            db.session.commit()
++            registration_service.register(event, current_user, quantity)
+             
+             flash(f'Successfully registered for {event.title}! Check your tickets.', 'success')
+             return redirect(url_for('my_tickets'))
+@@ -383,17 +378,8 @@
+             return redirect(url_for('index'))
+             
+         # Get tickets for the current user
+-        upcoming_tickets = Ticket.query.join(Event).filter(
+-            Ticket.attendee_id == current_user.id,
+-            Ticket.status == TicketStatus.PAID,
+-            Event.start_date > datetime.utcnow()
+-        ).order_by(Event.start_date).all()
+-        
+-        past_tickets = Ticket.query.join(Event).filter(
+-            Ticket.attendee_id == current_user.id,
+-            Ticket.status == TicketStatus.PAID,
+-            Event.end_date <= datetime.utcnow()
+-        ).order_by(Event.start_date.desc()).all()
++        upcoming_tickets = ticket_repo.list_upcoming_for_user(current_user.id)
++        past_tickets = ticket_repo.list_past_for_user(current_user.id)
+         
+         return render_template('attendee/my_tickets.html', 
+                                upcoming_tickets=upcoming_tickets, 
+@@ -406,7 +392,9 @@
+             flash('You need to be an attendee to cancel tickets.', 'danger')
+             return redirect(url_for('index'))
+             
+-        ticket = Ticket.query.get_or_404(ticket_id)
++        ticket = ticket_repo.get_by_id(ticket_id)
++        if ticket is None:
++            abort(404)
+         
+         # Check if the ticket belongs to the current user
+         if ticket.attendee_id != current_user.id:
+@@ -419,7 +407,7 @@
+             return redirect(url_for('my_tickets'))
+             
+         ticket.set_cancelled()
+-        db.session.commit()
++        ticket_repo.save(ticket)
+         
+         flash('Ticket cancelled successfully!', 'success')
+         return redirect(url_for('my_tickets'))
+@@ -440,12 +428,12 @@
+                 return redirect(url_for('attendee_profile'))
+                 
+             # Check if username is already taken by another user
+-            if form.username.data != current_user.username and User.query.filter_by(username=form.username.data).first():
++            if form.username.data != current_user.username and user_repo.get_by_username(form.username.data):
+                 flash('Username is already taken.', 'danger')
+                 return redirect(url_for('attendee_profile'))
+                 
+             # Check if email is already taken by another user
+-            if form.email.data != current_user.email and User.query.filter_by(email=form.email.data).first():
++            if form.email.data != current_user.email and user_repo.get_by_email(form.email.data):
+                 flash('Email is already registered.', 'danger')
+                 return redirect(url_for('attendee_profile'))
+                 
+@@ -459,7 +447,7 @@
+             if form.new_password.data:
+                 current_user.set_password(form.new_password.data)
+                 
+-            db.session.commit()
++            user_repo.save(current_user)
+             flash('Profile updated successfully!', 'success')
+             return redirect(url_for('attendee_profile'))
+             

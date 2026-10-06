@@ -1,0 +1,2 @@
+Conversation-derived prompt record (reconstructed):
+Create representative small implementations of the Repository, Strategy, and Observer patterns in Java, Python, JavaScript, and C++. Use equivalent deterministic inputs/expected outputs across languages. Compile/run each implementation, perform one warm-up and five measured runs, and record the median process time without estimating missing timings.

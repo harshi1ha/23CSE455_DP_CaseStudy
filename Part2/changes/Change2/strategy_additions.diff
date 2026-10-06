@@ -1,0 +1,61 @@
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/strategies/base_filter.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,10 @@
++from abc import ABC, abstractmethod
++
++
++class EventFilterStrategy(ABC):
++    """Strategy interface for one interchangeable event-search criterion."""
++
++    @abstractmethod
++    def apply(self, query):
++        """Return the query after applying this criterion."""
++        raise NotImplementedError
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/strategies/text_search_strategy.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,11 @@
++from models import Event
++from .base_filter import EventFilterStrategy
++
++
++class TextSearchStrategy(EventFilterStrategy):
++    def __init__(self, text):
++        self.text = text
++
++    def apply(self, query):
++        search_query = f"%{self.text}%"
++        return query.filter(Event.title.like(search_query) | Event.description.like(search_query))
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/strategies/category_filter_strategy.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,10 @@
++from models import Event
++from .base_filter import EventFilterStrategy
++
++
++class CategoryFilterStrategy(EventFilterStrategy):
++    def __init__(self, category):
++        self.category = category
++
++    def apply(self, query):
++        return query.filter(Event.category == self.category)
+--- /dev/null	2026-10-06 14:04:23.086715873 +0000
++++ Part2/code/evolved/strategies/date_range_strategy.py	2026-10-06 06:53:24.000000000 +0000
+@@ -0,0 +1,18 @@
++from models import Event
++from .base_filter import EventFilterStrategy
++
++
++class DateFromFilterStrategy(EventFilterStrategy):
++    def __init__(self, date_from):
++        self.date_from = date_from
++
++    def apply(self, query):
++        return query.filter(Event.start_date >= self.date_from)
++
++
++class DateToFilterStrategy(EventFilterStrategy):
++    def __init__(self, date_to):
++        self.date_to = date_to
++
++    def apply(self, query):
++        return query.filter(Event.start_date <= self.date_to)
